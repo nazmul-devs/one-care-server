@@ -29,6 +29,16 @@ async function run() {
 			console.log(result);
 			res.json(result);
 		});
+
+		// get appoinment data from database by email
+		app.get("/appoinment", async (req, res) => {
+			const email = req.query.email;
+			const result = await apoinmentCollection
+				.find({ email: email })
+				.toArray();
+			res.send(result);
+			console.log("Get appoinment data ", email);
+		});
 	} finally {
 		// await client.close();
 	}
