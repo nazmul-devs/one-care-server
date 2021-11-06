@@ -30,14 +30,15 @@ async function run() {
 			res.json(result);
 		});
 
-		// get appoinment data from database by email
+		// get appoinment data from database by email and date
 		app.get("/appoinment", async (req, res) => {
 			const email = req.query.email;
+			const date = req.query.date;
 			const result = await apoinmentCollection
-				.find({ email: email })
+				.find({ email: email, date: date })
 				.toArray();
 			res.send(result);
-			console.log("Get appoinment data ", email);
+			console.log("Get appoinment data ", req.query);
 		});
 	} finally {
 		// await client.close();
