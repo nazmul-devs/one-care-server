@@ -21,12 +21,12 @@ async function run() {
 		await client.connect();
 		const database = client.db("oneCareDoctors");
 		const apoinmentCollection = database.collection("appoinments");
+		const usersCollection = database.collection("users");
 
 		// post appoinment data to database
 		app.post("/appoinment", async (req, res) => {
 			const appoinment = req.body;
 			const result = await apoinmentCollection.insertOne(appoinment);
-			console.log(result);
 			res.json(result);
 		});
 
@@ -38,7 +38,13 @@ async function run() {
 				.find({ email: email, date: date })
 				.toArray();
 			res.send(result);
-			console.log("Get appoinment data ", req.query);
+		});
+		// save user from clyent site
+		app.post("/users", async (req, res) => {
+			const user = req.body;
+			const result = await usersCollection.insertOne(user);
+			res.json(result);
+			console.log(result);
 		});
 	} finally {
 		// await client.close();
