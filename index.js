@@ -4,15 +4,14 @@ const admin = require("firebase-admin");
 const app = express();
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
-
+const port = process.env.PORT || 5000;
 // firebase idtoken
-const serviceAccount = require("./one-care-family-doctors.json");
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
 });
 
-const port = 5000;
 app.use(cors());
 app.use(express.json());
 
@@ -36,12 +35,29 @@ async function varifyToken(req, res, next) {
 	}
 	next();
 }
+
+// mongodb data handle
 async function run() {
 	try {
 		await client.connect();
 		const database = client.db("oneCareDoctors");
 		const apoinmentCollection = database.collection("appoinments");
 		const usersCollection = database.collection("users");
+		const appoinmentServicesCollection =
+			database.collection("appoinmentServices");
+
+		// get appoinment services
+		app.get("services", async (req, res) => {
+			const result = await appoinmentServicesCollection.find({}).toArray();
+			res.send(result);
+			console.log("hitting service");
+		});
+		app.post("services", async (req, res) => {
+			const data = req.body;
+			const result = await appoinmentServicesCollection.insertOne(data);
+			res.json(result);
+			console.log("hitting", result);
+		});
 
 		// post appoinment data to database
 		app.post("/appoinment", async (req, res) => {
